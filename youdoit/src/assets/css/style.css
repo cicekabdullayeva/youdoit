@@ -472,7 +472,7 @@ border-color: transparent !important;
   padding-top: 30px;
   align-items: center;
   background: rgba(255, 255, 255, 1);
-
+  height: calc(100vh - 81px);
 }
 .chat-side-menu a{
   height: 37px;
@@ -485,6 +485,20 @@ border-color: transparent !important;
 }
 .chat-side-menu a.active{
   background-color: #3083DC ;
+}
+.chat-message {
+  padding:20px;
+}
+.chat-message h2{
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 30px;
+  color: #040647;
+  opacity: 0.8;
+}
+.chat-message .btn-light{
+  background-color: transparent !important;
+  border-color: transparent !important;
 }
 @media only screen and (min-width: 992px) {
   .login .right {
