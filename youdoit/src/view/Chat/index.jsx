@@ -13,6 +13,8 @@ import { Link } from "react-router-dom";
 import { chatMenu } from "../../menu/chatMenu.js";
 import Message from "../../component/Message/index.jsx";
 import RightSidebar from "../../component/RightSidebar/index.jsx";
+import TheirMessages from "../../component/TheirMessage/index.jsx";
+import MyMessages from "../../component/MyMessage/index.jsx";
 const Chat = () => {
   const [visibleSidebar, setVisibleSidebar] = useState(false);
   console.log(visibleSidebar);
@@ -189,30 +191,8 @@ const Chat = () => {
                 </div>
                 <div className="messages-box position-relative">
                   <div className="messages-inside">
-                    <div className="other-side">
-                      <div className="d-flex align-items-end">
-                        <Image
-                          src="https://picsum.photos/200/300"
-                          roundedCircle
-                        />
-                        <div className="sender-message">
-                          <p>
-                            Lorem Ipsum passages, and more reces, and more
-                            recently with recently with desk Ipsum.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="send-time">Today at 1:32pm</div>
-                    </div>
-                    <div className="user-side">
-                      <div className="self-message">
-                        <p>
-                          Lorem Ipsum passages, and more reces, and more
-                          recently with desk Ipsum.
-                        </p>
-                      </div>
-                      <div className="send-time">Today at 1:32pm</div>
-                    </div>
+                    <TheirMessages />
+                    <MyMessages />
                   </div>
                   <div className="write-container">
                     <Button>

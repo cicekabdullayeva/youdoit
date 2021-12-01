@@ -222,7 +222,7 @@ label {
   font-size: 14px;
 }
 
-.form-group {
+.form-label {
   margin-bottom: 20px;
   position: relative;
 }
@@ -248,7 +248,9 @@ label {
   outline: none;
   box-shadow: none;
 }
-
+/* .login .btn-primary {
+  margin-top: 40px;
+} */
 .login .short-desc {
   font-weight: 600;
   font-size: 24px;
@@ -461,7 +463,11 @@ label {
   color: #193651;
   padding: 10px;
 }
-
+.password-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
 .sidebar {
   position: fixed;
   height: calc(100vh - 80px);
@@ -662,6 +668,9 @@ label {
   max-width: 350px;
   background: #f0f0f0;
 }
+.img-sender-message {
+  background-color: transparent;
+}
 .sender-message p,
 .self-message p {
   font-size: 14px;
@@ -689,6 +698,12 @@ label {
   flex-direction: column;
   align-items: flex-end;
   margin-bottom: 10px;
+}
+.user-side img,
+.sender-message img {
+  width: 120px;
+  height: 112px;
+  border-radius: 4px;
 }
 .self-message {
   background: rgba(48, 131, 220, 0.8);
