@@ -19,6 +19,7 @@ export default class Login extends React.Component {
       email: "",
       password: "",
       passwordShown: false,
+      validated: false,
     };
 
     this.getInputValue = this.getInputValue.bind(this);
@@ -41,6 +42,9 @@ export default class Login extends React.Component {
   };
 
   sendData = (event) => {
+    const form = event.currentTarget;
+    // if (form.checkValidity() === false) {
+    //   console.log("getmelidir");
     event.preventDefault();
     let self = this;
     let data = {
@@ -60,11 +64,17 @@ export default class Login extends React.Component {
       .then((res) => {
         console.log(res.data);
         // if (res.data.success) {
-        //   window.location.replace("/Note");
-        // localStorage.setItem("token", response.data.data.token);
+        window.location.replace("/Chat");
+        localStorage.setItem("token", res.data.token);
         // }
       })
-      .catch(function (response) {});
+      .catch(function (response) {
+        console.log(response);
+      });
+    // }
+    // this.setState({
+    //   validated: true,
+    // });
   };
 
   render() {
@@ -206,23 +216,33 @@ export default class Login extends React.Component {
                       <div className="create-account text-center">
                         New user? <Link to="/Register"> Create an account</Link>
                       </div>
-                      <Form className="form-list" onSubmit={this.sendData}>
+                      <Form
+                        className="form-list"
+                        onSubmit={this.sendData}
+                        noValidate
+                        validated={this.state.validated}
+                      >
                         <Form.Group controlId="formBasicName">
                           <span className="input-title">Email</span>
                           <Form.Label>
                             <Form.Control
                               type="text"
                               placeholder="Emailinizi daxil edin"
+                              required
                               onChange={(event) =>
                                 this.getInputValue("email", event)
                               }
                             />
+                            <Form.Control.Feedback type="invalid">
+                              Email boş buraxıla bilməz
+                            </Form.Control.Feedback>
                           </Form.Label>
                         </Form.Group>
                         <Form.Group controlId="formBasicPassword">
                           <span className="input-title">Password</span>
                           <Form.Label>
                             <Form.Control
+                              required
                               type={
                                 this.state.passwordShown ? "text" : "password"
                               }
@@ -231,6 +251,9 @@ export default class Login extends React.Component {
                                 this.getInputValue("password", event)
                               }
                             />
+                            <Form.Control.Feedback type="invalid">
+                              Şifrə boş buraxıla bilməz
+                            </Form.Control.Feedback>
                             <Button
                               type="button"
                               className="btn-transparent password-button"

@@ -26,7 +26,7 @@ axiosInstance.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
 
-    console.log(error.response.status)
+    console.log(error.response.data.message)
     // if (error.response.status === 406) {
     //     localStorage.clear();
     //     window.location.reload();

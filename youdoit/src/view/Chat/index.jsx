@@ -6,18 +6,42 @@ import {
   InputGroup,
   FormControl,
   Image,
+  Modal,
+  Form,
 } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./header.jsx";
 import { Link } from "react-router-dom";
 import { chatMenu } from "../../menu/chatMenu.js";
-import Message from "../../component/Message/index.jsx";
+import Message from "../../component/Person/index.jsx";
 import RightSidebar from "../../component/RightSidebar/index.jsx";
-import TheirMessages from "../../component/TheirMessage/index.jsx";
-import MyMessages from "../../component/MyMessage/index.jsx";
+import io from "socket.io-client";
+import Messages from "../../component/Messages/index.jsx";
+import MessageInput from "../../component/MessageInput/index.jsx";
+import SearchModal from "../../component/SearchModal/index.jsx";
+import SearchSidebar from "../../component/SearchSidebar/index.jsx";
 const Chat = () => {
   const [visibleSidebar, setVisibleSidebar] = useState(false);
-  console.log(visibleSidebar);
+  const [socket, setSocket] = useState(null);
+  const [response, setResponse] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [searchSidebar, setSearchSidebar] = useState(false);
+  let data = localStorage.getItem("token");
+  console.log(data);
+  useEffect(() => {
+    const newSocket = io(`https://chat.youdoit.app`, {
+      header: `authorization:Bearer ${data}`,
+      transports: ["websocket"],
+      credentials: true,
+      forceNew: true,
+    });
+    newSocket.on("connect", () => console.log("connected: ", newSocket.id));
+    setSocket(newSocket);
+
+    return () => newSocket.close();
+  }, [setSocket]);
+
+  console.log(socket);
   return (
     <>
       <Header />
@@ -33,101 +57,117 @@ const Chat = () => {
                 );
               })}
             </Col>
-            <Col className="chat-message" xs={3}>
-              <div className="d-flex w-100">
-                <h2>Söhbətlər</h2>
-                <Button variant="light" className="ms-auto">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <rect
-                      width="20"
-                      height="20"
-                      rx="4"
-                      fill="#2ED06A"
-                      fillOpacity="0.6"
-                    />
-                    <path
-                      d="M14.6668 10.6663H10.6668V14.6663H9.3335V10.6663H5.3335V9.33301H9.3335V5.33301H10.6668V9.33301H14.6668V10.6663Z"
-                      fill="white"
-                    />
-                  </svg>
-                </Button>
-                <Button variant="light">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clipPath="url(#clip0_831_429)">
-                      <path
-                        d="M15.4142 9.41421C16.1953 8.63317 16.1953 7.36683 15.4142 6.58578C14.6332 5.80473 13.3668 5.80473 12.5858 6.58578C11.8047 7.36683 11.8047 8.63317 12.5858 9.41421C13.3668 10.1953 14.6332 10.1953 15.4142 9.41421Z"
-                        fill="#181818"
-                        fillOpacity="0.7"
-                      />
-                      <path
-                        d="M9.41419 9.41421C10.1952 8.63317 10.1952 7.36683 9.41419 6.58578C8.63315 5.80473 7.36682 5.80473 6.58578 6.58578C5.80474 7.36683 5.80474 8.63317 6.58578 9.41421C7.36682 10.1953 8.63315 10.1953 9.41419 9.41421Z"
-                        fill="#181818"
-                        fillOpacity="0.7"
-                      />
-                      <path
-                        d="M3.41421 9.41421C4.19525 8.63317 4.19525 7.36683 3.41421 6.58578C2.63316 5.80473 1.36683 5.80473 0.585784 6.58578C-0.195261 7.36683 -0.195261 8.63317 0.585784 9.41421C1.36683 10.1953 2.63316 10.1953 3.41421 9.41421Z"
-                        fill="#181818"
-                        fillOpacity="0.7"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_831_429">
+            {!searchSidebar ? (
+              <>
+                <Col className="chat-message" xs={3}>
+                  <div className="d-flex w-100">
+                    <h2>Söhbətlər</h2>
+                    <Button
+                      variant="light"
+                      className="ms-auto"
+                      onClick={() => {
+                        // setModalVisible(true);
+                        setSearchSidebar(true);
+                      }}
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
                         <rect
-                          width="16"
-                          height="16"
-                          fill="white"
-                          transform="matrix(1 0 0 -1 0 16)"
+                          width="20"
+                          height="20"
+                          rx="4"
+                          fill="#2ED06A"
+                          fillOpacity="0.6"
                         />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </Button>
-              </div>
-              <InputGroup className="mb-3">
-                <FormControl placeholder="Çatda axtar..." />
-                <InputGroup.Text id="basic-addon2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6.4316 11.9218C9.46375 11.9218 11.9218 9.46375 11.9218 6.4316C11.9218 3.39945 9.46375 0.941406 6.4316 0.941406C3.39945 0.941406 0.941406 3.39945 0.941406 6.4316C0.941406 9.46375 3.39945 11.9218 6.4316 11.9218Z"
-                      stroke="#0F2351"
-                      strokeOpacity="0.6"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M15.0589 15.0584L10.353 10.3525"
-                      stroke="#0F2351"
-                      strokeOpacity="0.6"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </InputGroup.Text>
-              </InputGroup>
-              <div className="messages-container">
-                <Message />
-              </div>
-            </Col>
+                        <path
+                          d="M14.6668 10.6663H10.6668V14.6663H9.3335V10.6663H5.3335V9.33301H9.3335V5.33301H10.6668V9.33301H14.6668V10.6663Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </Button>
+                    <Button variant="light">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <g clipPath="url(#clip0_831_429)">
+                          <path
+                            d="M15.4142 9.41421C16.1953 8.63317 16.1953 7.36683 15.4142 6.58578C14.6332 5.80473 13.3668 5.80473 12.5858 6.58578C11.8047 7.36683 11.8047 8.63317 12.5858 9.41421C13.3668 10.1953 14.6332 10.1953 15.4142 9.41421Z"
+                            fill="#181818"
+                            fillOpacity="0.7"
+                          />
+                          <path
+                            d="M9.41419 9.41421C10.1952 8.63317 10.1952 7.36683 9.41419 6.58578C8.63315 5.80473 7.36682 5.80473 6.58578 6.58578C5.80474 7.36683 5.80474 8.63317 6.58578 9.41421C7.36682 10.1953 8.63315 10.1953 9.41419 9.41421Z"
+                            fill="#181818"
+                            fillOpacity="0.7"
+                          />
+                          <path
+                            d="M3.41421 9.41421C4.19525 8.63317 4.19525 7.36683 3.41421 6.58578C2.63316 5.80473 1.36683 5.80473 0.585784 6.58578C-0.195261 7.36683 -0.195261 8.63317 0.585784 9.41421C1.36683 10.1953 2.63316 10.1953 3.41421 9.41421Z"
+                            fill="#181818"
+                            fillOpacity="0.7"
+                          />
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_831_429">
+                            <rect
+                              width="16"
+                              height="16"
+                              fill="white"
+                              transform="matrix(1 0 0 -1 0 16)"
+                            />
+                          </clipPath>
+                        </defs>
+                      </svg>
+                    </Button>
+                  </div>
+                  <InputGroup className="mb-3">
+                    <FormControl placeholder="Çatda axtar..." />
+                    <InputGroup.Text id="basic-addon2">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6.4316 11.9218C9.46375 11.9218 11.9218 9.46375 11.9218 6.4316C11.9218 3.39945 9.46375 0.941406 6.4316 0.941406C3.39945 0.941406 0.941406 3.39945 0.941406 6.4316C0.941406 9.46375 3.39945 11.9218 6.4316 11.9218Z"
+                          stroke="#0F2351"
+                          strokeOpacity="0.6"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M15.0589 15.0584L10.353 10.3525"
+                          stroke="#0F2351"
+                          strokeOpacity="0.6"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </InputGroup.Text>
+                  </InputGroup>
+                  <div className="messages-container">
+                    <Message />
+                  </div>
+                </Col>
+              </>
+            ) : (
+              <SearchSidebar
+                setSearchSidebar={setSearchSidebar}
+                socket={socket}
+              />
+            )}
             <Col className="p-0 h-100">
               <div className="message-container">
                 <div className="message-header">
@@ -189,49 +229,14 @@ const Chat = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="messages-box position-relative">
-                  <div className="messages-inside">
-                    <TheirMessages />
-                    <MyMessages />
+                {socket ? (
+                  <div className="messages-box position-relative">
+                    <Messages socket={socket} />
+                    <MessageInput socket={socket} />
                   </div>
-                  <div className="write-container">
-                    <Button>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 30 30"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle cx="15" cy="15" r="15" fill="#3083DC" />
-                        <path
-                          d="M20.25 15.75H15.75V20.25H14.25V15.75H9.75V14.25H14.25V9.75H15.75V14.25H20.25V15.75Z"
-                          fill="white"
-                        />
-                      </svg>
-                    </Button>
-                    <InputGroup>
-                      <FormControl
-                        placeholder="Write a message"
-                        aria-describedby="message"
-                      />
-                      <InputGroup.Text id="message">
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M1.67533 17.5L19.167 10L1.67533 2.5L1.66699 8.33333L14.167 10L1.66699 11.6667L1.67533 17.5Z"
-                            fill="#3083DC"
-                          />
-                        </svg>
-                      </InputGroup.Text>
-                    </InputGroup>
-                  </div>
-                </div>
+                ) : (
+                  <h4>Dissconnect</h4>
+                )}
               </div>
             </Col>
             {visibleSidebar ? <RightSidebar /> : null}

@@ -3,14 +3,14 @@ import React from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
-import * as axiosInstance from "../../api/Login";
+import axiosInstance from "../../api/Login";
 
 const optionsLang = [
   { value: "az", label: "AZ" },
   { value: "en", label: "EN" },
   { value: "ru", label: "RU" },
 ];
-
+ 
 export default class Register extends React.Component {
   constructor(props) {
     super(props);
@@ -66,9 +66,12 @@ export default class Register extends React.Component {
         if (response.data.success) {
           console.log("okay");
           localStorage.setItem("token", response.data.data.token);
+          window.location.replace("/");
         }
       })
-      .catch(function (response) {});
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   render() {
