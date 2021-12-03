@@ -1,7 +1,18 @@
 import { Button, InputGroup, FormControl } from "react-bootstrap";
-// import TheirMessages from "../../component/TheirMessage/index.jsx";
-// import MyMessages from "../../component/MyMessage/index.jsx";
-const MessageInput = () => {
+import { useState, useEffect } from "react";
+
+const MessageInput = ({ roomId, messages, setMessages = () => {} }) => {
+  const [myMessage, setMyMessage] = useState("");
+  let allMessages = [...messages];
+  useEffect(() => {
+    window.socket.on("message", (mess) => {
+      console.log(mess, "mess");
+      allMessages.push(mess);
+      setMessages(allMessages);
+      console.log(allMessages);
+    });
+  }, []);
+
   return (
     <div className="write-container">
       <Button>
@@ -20,22 +31,36 @@ const MessageInput = () => {
         </svg>
       </Button>
       <InputGroup>
-        <FormControl placeholder="Write a message" aria-describedby="message" />
-        <InputGroup.Text id="message">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M1.67533 17.5L19.167 10L1.67533 2.5L1.66699 8.33333L14.167 10L1.66699 11.6667L1.67533 17.5Z"
-              fill="#3083DC"
-            />
-          </svg>
-        </InputGroup.Text>
+        <FormControl
+          placeholder="Write a message"
+          aria-describedby="message"
+          onChange={(e) => {
+            setMyMessage(e.target.value);
+          }}
+        />
       </InputGroup>
+      <Button
+        class="btn-transparent flex-center"
+        onClick={() => {
+          window.socket.emit("message", {
+            room_id: roomId,
+            message: myMessage,
+          });
+        }}
+      >
+        <svg
+          width="19"
+          height="16"
+          viewBox="0 0 19 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M0.676302 15.5L18.168 8L0.676302 0.5L0.667969 6.33333L13.168 8L0.667969 9.66667L0.676302 15.5Z"
+            fill="#3083DC"
+          />
+        </svg>
+      </Button>
     </div>
   );
 };

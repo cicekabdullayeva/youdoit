@@ -42,7 +42,7 @@ export default class Login extends React.Component {
   };
 
   sendData = (event) => {
-    const form = event.currentTarget;
+    // const form = event.currentTarget;
     // if (form.checkValidity() === false) {
     //   console.log("getmelidir");
     event.preventDefault();

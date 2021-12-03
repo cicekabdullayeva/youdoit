@@ -6,42 +6,55 @@ import {
   InputGroup,
   FormControl,
   Image,
-  Modal,
-  Form,
 } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import Header from "./header.jsx";
 import { Link } from "react-router-dom";
 import { chatMenu } from "../../menu/chatMenu.js";
-import Message from "../../component/Person/index.jsx";
 import RightSidebar from "../../component/RightSidebar/index.jsx";
+import RightMessage from "../../component/RightMessageBlock/index.jsx";
 import io from "socket.io-client";
 import Messages from "../../component/Messages/index.jsx";
 import MessageInput from "../../component/MessageInput/index.jsx";
-import SearchModal from "../../component/SearchModal/index.jsx";
 import SearchSidebar from "../../component/SearchSidebar/index.jsx";
+
+let socket;
 const Chat = () => {
   const [visibleSidebar, setVisibleSidebar] = useState(false);
-  const [socket, setSocket] = useState(null);
-  const [response, setResponse] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
+  const [connect, setConnect] = useState(false);
   const [searchSidebar, setSearchSidebar] = useState(false);
-  let data = localStorage.getItem("token");
-  console.log(data);
+  const [contacts, setContacts] = useState([]);
+  const [room, setRoom] = useState(null);
+  const [roomId, setRoomId] = useState("");
+  const [messages, setMessages] = useState([]);
+  // console.log(messages, "chat-messages");
+  // setInterval(() => {
+  //   console.log(messages, "messages");
+  // }, 5000);
   useEffect(() => {
-    const newSocket = io(`https://chat.youdoit.app`, {
-      header: `authorization:Bearer ${data}`,
-      transports: ["websocket"],
+    console.log("rendered");
+    let data = localStorage.getItem("token");
+    socket = io(`https://chat.youdoit.app`, {
+      extraHeaders: {
+        authorization: `Bearer ${data}`,
+      },
+      transports: ["polling"],
       credentials: true,
       forceNew: true,
     });
-    newSocket.on("connect", () => console.log("connected: ", newSocket.id));
-    setSocket(newSocket);
+    socket.on("connect", () => {
+      console.log("connected", socket.id);
+      socket.emit("listContacts");
+      socket.on("listContacts", (item) => {
+        setContacts(item);
+      });
+      window.socket = socket;
+      setConnect(true);
+    });
+    socket.on("disconnect", () => console.log("disconnected"));
+    return () => socket.close();
+  }, []);
 
-    return () => newSocket.close();
-  }, [setSocket]);
-
-  console.log(socket);
   return (
     <>
       <Header />
@@ -158,86 +171,136 @@ const Chat = () => {
                     </InputGroup.Text>
                   </InputGroup>
                   <div className="messages-container">
-                    <Message />
+                    {contacts?.length > 0 &&
+                      contacts.map((contact, index) => {
+                        return (
+                          // <RightMessage
+                          //   name={contact.name}
+                          //   id={contact.id}
+                          //   key={contact.id}
+                          // />
+                          <div
+                            className="message"
+                            key={index}
+                            onClick={() => {
+                              setRoom(contact.name);
+                              setRoomId(contact.id);
+                              window.socket.emit("getMessages", {
+                                room_id: contact.id,
+                              });
+                              window.socket.on("getMessages", (messages) => {
+                                console.log(messages, "messages");
+                              });
+                            }}
+                          >
+                            <Image
+                              src="https://picsum.photos/200/300"
+                              roundedCircle
+                            />
+                            <div className="right-side">
+                              <h3 className="from-who">{contact.name}</h3>
+                              <p className="message-content">
+                                Bu gün işəgələcəksən?
+                              </p>
+                              <span className="time">5d</span>
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
                 </Col>
               </>
             ) : (
-              <SearchSidebar
-                setSearchSidebar={setSearchSidebar}
-                socket={socket}
-              />
+              <SearchSidebar setSearchSidebar={setSearchSidebar} />
             )}
             <Col className="p-0 h-100">
-              <div className="message-container">
-                <div className="message-header">
-                  <Image src="https://picsum.photos/200/300" roundedCircle />
-                  <h3 className="from-who">Nazrin Miriyeva</h3>
-                  <div className="icons ms-auto">
-                    <Link>
-                      <svg
-                        width="22"
-                        height="22"
-                        viewBox="0 0 22 22"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+              {room !== null ? (
+                <div className="message-container">
+                  <div className="message-header">
+                    <Image src="https://picsum.photos/200/300" roundedCircle />
+                    <h3 className="from-who">{room}</h3>
+                    <div className="icons ms-auto">
+                      <Link>
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 22 22"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M20.2347 14.4405C18.8878 14.4405 17.5653 14.2298 16.312 13.8157C15.6979 13.6062 14.943 13.7984 14.5682 14.1833L12.0945 16.0507C9.22573 14.5193 7.45863 12.7528 5.94819 9.90556L7.76061 7.49633C8.23149 7.02608 8.40039 6.33915 8.19804 5.69462C7.7821 4.43478 7.57081 3.11289 7.57081 1.76539C7.57086 0.791943 6.77892 0 5.80554 0H1.76533C0.791943 0 0 0.791943 0 1.76533C0 12.9229 9.07718 22 20.2347 22C21.2081 22 22.0001 21.2081 22.0001 20.2347V16.2058C22 15.2324 21.2081 14.4405 20.2347 14.4405Z"
+                            fill="#3083DC"
+                          />
+                        </svg>
+                      </Link>
+                      <Link>
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 22 22"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12.4442 4.53711H2.407C1.08315 4.53711 0 5.62026 0 6.94411V15.0557C0 16.3796 1.08315 17.4627 2.407 17.4627H12.4442C13.7681 17.4627 14.8512 16.3796 14.8512 15.0557V6.94411C14.8512 5.59619 13.7681 4.53711 12.4442 4.53711Z"
+                            fill="#3083DC"
+                          />
+                          <path
+                            d="M20.2188 5.86104C20.0744 5.88511 19.93 5.95732 19.8096 6.02953L16.0547 8.19583V13.7801L19.8337 15.9464C20.5317 16.3556 21.3982 16.1149 21.8074 15.4168C21.9278 15.2002 22 14.9595 22 14.6947V7.2571C22 6.36651 21.1575 5.64441 20.2188 5.86104Z"
+                            fill="#3083DC"
+                          />
+                        </svg>
+                      </Link>
+                      <Button
+                        className="btn-light"
+                        onClick={() => {
+                          visibleSidebar
+                            ? setVisibleSidebar(false)
+                            : setVisibleSidebar(true);
+                        }}
                       >
-                        <path
-                          d="M20.2347 14.4405C18.8878 14.4405 17.5653 14.2298 16.312 13.8157C15.6979 13.6062 14.943 13.7984 14.5682 14.1833L12.0945 16.0507C9.22573 14.5193 7.45863 12.7528 5.94819 9.90556L7.76061 7.49633C8.23149 7.02608 8.40039 6.33915 8.19804 5.69462C7.7821 4.43478 7.57081 3.11289 7.57081 1.76539C7.57086 0.791943 6.77892 0 5.80554 0H1.76533C0.791943 0 0 0.791943 0 1.76533C0 12.9229 9.07718 22 20.2347 22C21.2081 22 22.0001 21.2081 22.0001 20.2347V16.2058C22 15.2324 21.2081 14.4405 20.2347 14.4405Z"
-                          fill="#3083DC"
-                        />
-                      </svg>
-                    </Link>
-                    <Link>
-                      <svg
-                        width="22"
-                        height="22"
-                        viewBox="0 0 22 22"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.4442 4.53711H2.407C1.08315 4.53711 0 5.62026 0 6.94411V15.0557C0 16.3796 1.08315 17.4627 2.407 17.4627H12.4442C13.7681 17.4627 14.8512 16.3796 14.8512 15.0557V6.94411C14.8512 5.59619 13.7681 4.53711 12.4442 4.53711Z"
-                          fill="#3083DC"
-                        />
-                        <path
-                          d="M20.2188 5.86104C20.0744 5.88511 19.93 5.95732 19.8096 6.02953L16.0547 8.19583V13.7801L19.8337 15.9464C20.5317 16.3556 21.3982 16.1149 21.8074 15.4168C21.9278 15.2002 22 14.9595 22 14.6947V7.2571C22 6.36651 21.1575 5.64441 20.2188 5.86104Z"
-                          fill="#3083DC"
-                        />
-                      </svg>
-                    </Link>
-                    <Button
-                      className="btn-light"
-                      onClick={() => {
-                        visibleSidebar
-                          ? setVisibleSidebar(false)
-                          : setVisibleSidebar(true);
-                      }}
-                    >
-                      <svg
-                        width="22"
-                        height="22"
-                        viewBox="0 0 22 22"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M11 0C4.95 0 0 4.95 0 11C0 17.05 4.95 22 11 22C17.05 22 22 17.05 22 11C22 4.95 17.05 0 11 0ZM12.1 16.5H9.9V9.9H12.1V16.5ZM12.1 7.7H9.9V5.5H12.1V7.7Z"
-                          fill="#3083DC"
-                        />
-                      </svg>
-                    </Button>
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 22 22"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M11 0C4.95 0 0 4.95 0 11C0 17.05 4.95 22 11 22C17.05 22 22 17.05 22 11C22 4.95 17.05 0 11 0ZM12.1 16.5H9.9V9.9H12.1V16.5ZM12.1 7.7H9.9V5.5H12.1V7.7Z"
+                            fill="#3083DC"
+                          />
+                        </svg>
+                      </Button>
+                    </div>
                   </div>
+                  {connect ? (
+                    <div className="messages-box position-relative">
+                      {messages?.length > 0 &&
+                        messages.map((item) => {
+                          return (
+                            <div className="messages-inside">
+                              <div className="user-side">
+                                <div className="self-message">
+                                  <p>{item.message}</p>
+                                </div>
+                                <div className="send-time">Today at 1:32pm</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      <MessageInput
+                        roomId={roomId}
+                        setMessages={setMessages}
+                        messages={messages}
+                      />
+                    </div>
+                  ) : (
+                    <h4>Dissconnect</h4>
+                  )}
                 </div>
-                {socket ? (
-                  <div className="messages-box position-relative">
-                    <Messages socket={socket} />
-                    <MessageInput socket={socket} />
-                  </div>
-                ) : (
-                  <h4>Dissconnect</h4>
-                )}
-              </div>
+              ) : null}
             </Col>
             {visibleSidebar ? <RightSidebar /> : null}
           </Row>

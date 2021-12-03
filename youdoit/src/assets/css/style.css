@@ -590,6 +590,8 @@ label {
   background-color: transparent;
   display: flex;
   align-items: center;
+  margin-bottom: 15px;
+  cursor: pointer;
 }
 .message img,
 .message-container img {
@@ -616,6 +618,14 @@ label {
   line-height: 18px;
   color: rgba(24, 24, 24, 0.6);
   margin-bottom: 0;
+}
+.message .add {
+  position: absolute;
+  bottom: 0;
+  right: 2px;
+}
+.message .add svg {
+  height: 15px;
 }
 .message .time {
   position: absolute;
@@ -644,6 +654,10 @@ label {
 }
 .icons a:not(:last-child) {
   margin-right: 22px;
+}
+.messages-container {
+  height: calc(100% - 114px);
+  overflow-y: scroll;
 }
 .messages-box {
   padding: 15px 40px 35px 20px;
