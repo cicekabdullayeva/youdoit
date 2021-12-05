@@ -1,7 +1,9 @@
 import React from "react";
 import { Container, Row, Col, Badge, Image, Dropdown } from "react-bootstrap";
 import { mainMenu } from "../../menu/mainMenu";
+import { useHistory } from "react-router-dom";
 const Header = () => {
+  let history = useHistory();
   return (
     <div>
       <div className="header">
@@ -111,7 +113,12 @@ const Header = () => {
                       </div>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                      <Dropdown.Item>
+                      <Dropdown.Item
+                        onClick={() => {
+                          localStorage.clear("token");
+                          history.push("/");
+                        }}
+                      >
                         <svg
                           width="20"
                           height="22"

@@ -24,6 +24,15 @@ export default class Login extends React.Component {
 
     this.getInputValue = this.getInputValue.bind(this);
   }
+  componentDidMount() {
+    let token = localStorage.getItem("token");
+    if (token) {
+      window.location.replace("/Chat");
+    }
+  }
+  componentDidUpdate() {
+    document.title = `You clicked ${this.state.count} times`;
+  }
 
   getInputValue = (stateVar, event) => {
     this.setState({
