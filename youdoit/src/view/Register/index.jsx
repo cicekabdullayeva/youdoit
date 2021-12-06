@@ -10,7 +10,7 @@ const optionsLang = [
   { value: "en", label: "EN" },
   { value: "ru", label: "RU" },
 ];
- 
+
 export default class Register extends React.Component {
   constructor(props) {
     super(props);
@@ -63,11 +63,11 @@ export default class Register extends React.Component {
       data: data,
     })
       .then(function (response) {
-        if (response.data.success) {
-          console.log("okay");
-          localStorage.setItem("token", response.data.data.token);
-          window.location.replace("/");
-        }
+        // if (response.data.success) {
+        console.log("okay");
+        localStorage.setItem("token", response.data.data.token);
+        window.location = "/";
+        // }
       })
       .catch((error) => {
         console.log(error);

@@ -6,17 +6,20 @@ import {
   InputGroup,
   FormControl,
   Image,
+  Modal,
 } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Header from "./header.jsx";
 import { Link } from "react-router-dom";
 import { chatMenu } from "../../menu/chatMenu.js";
 import RightSidebar from "../../component/RightSidebar/index.jsx";
-import RightMessage from "../../component/RightMessageBlock/index.jsx";
+// import RightMessage from "../../component/RightMessageBlock/index.jsx";
 import io from "socket.io-client";
 import Messages from "../../component/Messages/index.jsx";
 import MessageInput from "../../component/MessageInput/index.jsx";
 import SearchSidebar from "../../component/SearchSidebar/index.jsx";
+// Add Video
+import { SocketContext } from "../../context/Context.js";
 
 let socket;
 let myId = localStorage.getItem("id");
@@ -29,10 +32,6 @@ const Chat = () => {
   const [room, setRoom] = useState(null);
   const [roomId, setRoomId] = useState("");
   const [messages, setMessages] = useState([]);
-  // console.log(messages, "chat-messages");
-  // setInterval(() => {
-  //   console.log(messages, "messages");
-  // }, 5000);
 
   useEffect(() => {
     console.log("rendered");
@@ -71,6 +70,10 @@ const Chat = () => {
     }
   }, [connect]);
 
+  // ADD VIDEO
+  const { callUser, answerCall, call, callAccepted } =
+    useContext(SocketContext);
+
   return (
     <>
       <Header />
@@ -80,7 +83,7 @@ const Chat = () => {
             <Col className="chat-side-menu" xs={2}>
               {chatMenu.map((menu) => {
                 return (
-                  <Link href="#" className={menu.active} key={menu.key}>
+                  <Link href="/" className={menu.active} key={menu.key}>
                     {menu.icon}
                   </Link>
                 );
@@ -219,7 +222,7 @@ const Chat = () => {
                               <p className="message-content">
                                 Bu gün işəgələcəksən?
                               </p>
-                              <span className="time">5d</span>
+                              {/* <span className="time">5d</span> */}
                             </div>
                           </div>
                         );
@@ -254,7 +257,8 @@ const Chat = () => {
                       <Button
                         className="btn-light"
                         onClick={() => {
-                          window.socket.emit("videoCall", { room_id: roomId });
+                          // window.socket.emit("videoCall", { room_id: roomId });
+                          callUser(roomId);
                         }}
                       >
                         <svg
@@ -315,6 +319,7 @@ const Chat = () => {
                                   </div>
                                   <div className="send-time">
                                     Today at 1:32pm
+                                    {call.isReceivingCall}
                                   </div>
                                 </div>
                               ) : (
@@ -346,6 +351,28 @@ const Chat = () => {
           </Row>
         </Container>
       </section>
+      {call.isReceivingCall && !callAccepted && (
+        <Modal centered>
+          <Modal.Header show="true" closeButton>
+            <Modal.Title>Receiving Call</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h4>{call.name}</h4>
+            <p>Is calling you</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary">Close</Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                answerCall(roomId);
+              }}
+            >
+              Aply
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </>
   );
 };

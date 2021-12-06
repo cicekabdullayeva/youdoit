@@ -652,8 +652,8 @@ label {
   padding: 0;
   border: none;
 }
-.icons a:not(:last-child) {
-  margin-right: 22px;
+.icons button {
+  margin-left: 22px;
 }
 .messages-container {
   height: calc(100% - 114px);
