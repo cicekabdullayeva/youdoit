@@ -30,9 +30,9 @@ export default class Login extends React.Component {
       window.location.replace("/Chat");
     }
   }
-  componentDidUpdate() {
-    document.title = `You clicked ${this.state.count} times`;
-  }
+  // componentDidUpdate() {
+  //   // document.title = `You clicked ${this.state.count} times`;
+  // }
 
   getInputValue = (stateVar, event) => {
     this.setState({
@@ -75,6 +75,7 @@ export default class Login extends React.Component {
         // if (res.data.success) {
         window.location.replace("/Chat");
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("id", res.data.id);
         // }
       })
       .catch(function (response) {

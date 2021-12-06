@@ -19,6 +19,8 @@ import MessageInput from "../../component/MessageInput/index.jsx";
 import SearchSidebar from "../../component/SearchSidebar/index.jsx";
 
 let socket;
+let myId = localStorage.getItem("id");
+console.log(myId);
 const Chat = () => {
   const [visibleSidebar, setVisibleSidebar] = useState(false);
   const [connect, setConnect] = useState(false);
@@ -31,6 +33,7 @@ const Chat = () => {
   // setInterval(() => {
   //   console.log(messages, "messages");
   // }, 5000);
+
   useEffect(() => {
     console.log("rendered");
     let data = localStorage.getItem("token");
@@ -54,6 +57,19 @@ const Chat = () => {
     socket.on("disconnect", () => console.log("disconnected"));
     return () => socket.close();
   }, []);
+
+  useEffect(() => {
+    if (connect) {
+      window.socket.on("message", (mess) => {
+        console.log(mess, "mess");
+        setMessages((old) => {
+          let allMessages = [...old];
+          allMessages.push(mess);
+          return allMessages;
+        });
+      });
+    }
+  }, [connect]);
 
   return (
     <>
@@ -185,12 +201,13 @@ const Chat = () => {
                             onClick={() => {
                               setRoom(contact.name);
                               setRoomId(contact.id);
-                              window.socket.emit("getMessages", {
-                                room_id: contact.id,
-                              });
-                              window.socket.on("getMessages", (messages) => {
-                                console.log(messages, "messages");
-                              });
+                              // window.socket.emit("getMessages", {
+                              //   room_id: contact.id,
+                              // });
+                              // window.socket.on("getMessages", (messages) => {
+                              //   console.log(messages, "messages");
+                              // });
+                              setMessages([]);
                             }}
                           >
                             <Image
@@ -220,7 +237,7 @@ const Chat = () => {
                     <Image src="https://picsum.photos/200/300" roundedCircle />
                     <h3 className="from-who">{room}</h3>
                     <div className="icons ms-auto">
-                      <Link>
+                      <Link to="/">
                         <svg
                           width="22"
                           height="22"
@@ -234,7 +251,12 @@ const Chat = () => {
                           />
                         </svg>
                       </Link>
-                      <Link>
+                      <Button
+                        className="btn-light"
+                        onClick={() => {
+                          window.socket.emit("videoCall", { room_id: roomId });
+                        }}
+                      >
                         <svg
                           width="22"
                           height="22"
@@ -251,7 +273,7 @@ const Chat = () => {
                             fill="#3083DC"
                           />
                         </svg>
-                      </Link>
+                      </Button>
                       <Button
                         className="btn-light"
                         onClick={() => {
@@ -277,19 +299,37 @@ const Chat = () => {
                   </div>
                   {connect ? (
                     <div className="messages-box position-relative">
-                      {messages?.length > 0 &&
-                        messages.map((item) => {
-                          return (
-                            <div className="messages-inside">
-                              <div className="user-side">
-                                <div className="self-message">
-                                  <p>{item.message}</p>
+                      <div className="messages-inside">
+                        {messages.length > 0
+                          ? messages.map((item, index) =>
+                              myId != item.user_id ? (
+                                <div className="other-side" key={index}>
+                                  <div className="d-flex align-items-end">
+                                    <Image
+                                      src="https://picsum.photos/200/300"
+                                      roundedCircle
+                                    />
+                                    <div className="sender-message">
+                                      <p>{item.message}</p>
+                                    </div>
+                                  </div>
+                                  <div className="send-time">
+                                    Today at 1:32pm
+                                  </div>
                                 </div>
-                                <div className="send-time">Today at 1:32pm</div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                              ) : (
+                                <div className="user-side" key={index}>
+                                  <div className="self-message">
+                                    <p>{item.message}</p>
+                                  </div>
+                                  <div className="send-time">
+                                    Today at 1:32pm
+                                  </div>
+                                </div>
+                              )
+                            )
+                          : null}
+                      </div>
                       <MessageInput
                         roomId={roomId}
                         setMessages={setMessages}

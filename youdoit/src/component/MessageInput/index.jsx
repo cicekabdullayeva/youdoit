@@ -1,17 +1,15 @@
 import { Button, InputGroup, FormControl } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import { useRef } from "react";
 
-const MessageInput = ({ roomId, messages, setMessages = () => {} }) => {
-  const [myMessage, setMyMessage] = useState("");
-  let allMessages = [...messages];
-  useEffect(() => {
-    window.socket.on("message", (mess) => {
-      console.log(mess, "mess");
-      allMessages.push(mess);
-      setMessages(allMessages);
-      console.log(allMessages);
+const MessageInput = ({ roomId }) => {
+  const messageRef = useRef();
+  const sendMessage = () => {
+    window.socket.emit("message", {
+      room_id: roomId,
+      message: messageRef.current.value,
     });
-  }, []);
+    messageRef.current.value = "";
+  };
 
   return (
     <div className="write-container">
@@ -34,18 +32,18 @@ const MessageInput = ({ roomId, messages, setMessages = () => {} }) => {
         <FormControl
           placeholder="Write a message"
           aria-describedby="message"
-          onChange={(e) => {
-            setMyMessage(e.target.value);
+          ref={(r) => (messageRef.current = r)}
+          onKeyPress={(event) => {
+            if (event.key === "Enter") {
+              sendMessage();
+            }
           }}
         />
       </InputGroup>
       <Button
-        class="btn-transparent flex-center"
+        className="btn-transparent flex-center"
         onClick={() => {
-          window.socket.emit("message", {
-            room_id: roomId,
-            message: myMessage,
-          });
+          sendMessage();
         }}
       >
         <svg
