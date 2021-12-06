@@ -311,12 +311,12 @@ export default class Login extends React.Component {
                         <div className="or flex-vertical-center">Or</div>
                         <ul className="socials list-unstyled">
                           <li className="relative">
-                            <Link to="/" class="btn-effect">
+                            <Link to="/" className="btn-effect">
                               <span className="flex">Continue with Google</span>
                             </Link>
                           </li>
                           <li className="relative">
-                            <Link to="/Register" class="btn-effect">
+                            <Link to="/Register" className="btn-effect">
                               <span className="flex">Register</span>
                             </Link>
                           </li>

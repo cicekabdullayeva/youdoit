@@ -91,7 +91,7 @@ const Chat = () => {
             </Col>
             {!searchSidebar ? (
               <>
-                <Col className="chat-message" xs={3}>
+                <Col className="chat-message" xs={3} md={4}>
                   <div className="d-flex w-100">
                     <h2>Söhbətlər</h2>
                     <Button
@@ -353,7 +353,7 @@ const Chat = () => {
       </section>
       {call.isReceivingCall && !callAccepted && (
         <Modal centered>
-          <Modal.Header show="true" closeButton>
+          <Modal.Header show={call.isReceivingCall} closeButton>
             <Modal.Title>Receiving Call</Modal.Title>
           </Modal.Header>
           <Modal.Body>

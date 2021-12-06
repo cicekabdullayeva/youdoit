@@ -13,6 +13,8 @@ import { lazy, Suspense, useEffect } from "react";
 import PageLoading from "./component/PageLoading";
 import Register from "./view/Register";
 import "./assets/css/stylemain.css";
+import { ContextProvider } from "./context/Context";
+
 const Chat = lazy(() => import("./view/Chat"));
 const Login = lazy(() => import("./view/Login"));
 // const Register = lazy(() => import("./view/Register"));
@@ -24,7 +26,6 @@ function App() {
     if (!login) {
       // history.replace("Login");
       // window.location.replace("Login");
-      console.log("not login");
     }
   }, [history]);
   return (
@@ -32,7 +33,11 @@ function App() {
       <Suspense fallback={<PageLoading />}>
         <Switch>
           <Route exact path="/" render={() => <Login />} />
-          <Route exact path="/Chat" render={() => <Chat />} />
+          <Route exact path="/Chat">
+            <ContextProvider>
+              <Chat />
+            </ContextProvider>
+          </Route>
           <Route exact path="/Register" render={() => <Register />} />
         </Switch>
       </Suspense>

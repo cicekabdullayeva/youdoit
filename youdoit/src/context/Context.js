@@ -1,6 +1,6 @@
-import React, { createContext, useState, useRef, useEffect } from 'react';
+import React, { createContext, useState, useRef, useEffect } from "react";
 // import { io } from 'socket.io-client';
-import Peer from 'simple-peer';
+import Peer from "simple-peer";
 
 const SocketContext = createContext();
 
@@ -11,14 +11,14 @@ const ContextProvider = ({ children }) => {
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [stream, setStream] = useState();
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [call, setCall] = useState({});
-  const [me, setMe] = useState('');
+  const [me, setMe] = useState("");
 
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
-//   let socket;
+  //   let socket;
 
   useEffect(() => {
     //   let data = localStorage.getItem("token");
@@ -30,11 +30,11 @@ const ContextProvider = ({ children }) => {
     //   credentials: true,
     //   forceNew: true,
     // });
-       let isMounted = true;
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    let isMounted = true;
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
-    //    if (isMounted)  setStream(currentStream);
-
+        //    if (isMounted)  setStream(currentStream);
         // myVideo.current.srcObject = currentStream;
       });
 
@@ -44,23 +44,26 @@ const ContextProvider = ({ children }) => {
     //   setCall({ isReceivingCall: true, from, name: callerName, signal });
     // });
     setTimeout(() => {
-        console.log('vvf', window.socket)
-        window.socket.on("videoCall",({  name, description })=>{
-            console.log("video zeng");
-            setCall({ isReceivingCall: true, name, description })
-    })
-    }, 2000);
-    
+      console.log("vvf", window.socket);
+      window.socket.on("videoCall", ({ name, description }) => {
+        console.log("video zeng");
+        setCall({ isReceivingCall: true, name, description });
+        console.log(call);
+      });
+    }, 5000);
+
     // console.log(connectionRef);
     // console.log(window.socket,"socket")
-     return () => { isMounted = false }
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const answerCall = (id) => {
     setCallAccepted(true);
     const peer = new Peer({ initiator: false, trickle: false, stream });
-    peer.on('signal', (data) => {
-      window.socket.emit('answerVideo', { description: data, room_id:id });
+    peer.on("signal", (data) => {
+      window.socket.emit("answerVideo", { description: data, room_id: id });
     });
     // peer.on('stream', (currentStream) => {
     //   userVideo.current.srcObject = currentStream;
@@ -73,17 +76,21 @@ const ContextProvider = ({ children }) => {
 
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
-    peer.on('signal', (data) => {
-        console.log(window.socket);
-      window.socket.emit('videoCall', { room_id: id, description: data ,name:"cicek" });
-      console.log("video is good")
+    peer.on("signal", (data) => {
+      console.log(window.socket);
+      window.socket.emit("videoCall", {
+        room_id: id,
+        description: data,
+        name: "cicek",
+      });
+      console.log("video is good");
     });
 
     // peer.on('stream', (currentStream) => {
     //   userVideo.current.srcObject = currentStream;
     // });
 
-    window.socket.on('answerVideo', (signal) => {
+    window.socket.on("answerVideo", (signal) => {
       setCallAccepted(true);
       console.log(signal);
       peer.signal(signal);
@@ -93,29 +100,30 @@ const ContextProvider = ({ children }) => {
     connectionRef.current = peer;
   };
 
-//   const leaveCall = () => {
-//     setCallEnded(true);
+  //   const leaveCall = () => {
+  //     setCallEnded(true);
 
-// //     connectionRef.current.destroy();
+  // //     connectionRef.current.destroy();
 
-// //     window.location.reload();
-//   };
+  // //     window.location.reload();
+  //   };
 
   return (
-    <SocketContext.Provider value={{
-      call,
-      callAccepted,
-      myVideo,
-      userVideo,
-      stream,
-      name,
-      setName,
-      callEnded,
-      me,
-      callUser,
-    //   leaveCall,
-      answerCall,
-    }}
+    <SocketContext.Provider
+      value={{
+        call,
+        callAccepted,
+        myVideo,
+        userVideo,
+        stream,
+        name,
+        setName,
+        callEnded,
+        me,
+        callUser,
+        //   leaveCall,
+        answerCall,
+      }}
     >
       {children}
     </SocketContext.Provider>
