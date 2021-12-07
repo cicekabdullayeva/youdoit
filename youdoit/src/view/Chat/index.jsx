@@ -101,7 +101,7 @@ const Chat = () => {
             </Col>
             {!searchSidebar ? (
               <>
-                <Col className="chat-message" xs={3}>
+                <Col className="chat-message" xs={3} md={4}>
                   <div className="d-flex w-100">
                     <h2>Söhbətlər</h2>
                     <Button
