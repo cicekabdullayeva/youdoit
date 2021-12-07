@@ -836,7 +836,12 @@ label {
   color: #181818;
   margin: 0;
 }
-
+.modal video {
+  width: 100%;
+}
+.modal-dialog {
+  max-width: 650px !important;
+}
 @media only screen and (min-width: 992px) {
   .login .right {
     padding: 20px 45px;

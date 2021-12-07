@@ -15,7 +15,7 @@ import { chatMenu } from "../../menu/chatMenu.js";
 import RightSidebar from "../../component/RightSidebar/index.jsx";
 // import RightMessage from "../../component/RightMessageBlock/index.jsx";
 import io from "socket.io-client";
-import Messages from "../../component/Messages/index.jsx";
+// import Messages from "../../component/Messages/index.jsx";
 import MessageInput from "../../component/MessageInput/index.jsx";
 import SearchSidebar from "../../component/SearchSidebar/index.jsx";
 // Add Video
@@ -23,7 +23,6 @@ import { SocketContext } from "../../context/Context.js";
 
 let socket;
 let myId = localStorage.getItem("id");
-console.log(myId);
 const Chat = () => {
   const [visibleSidebar, setVisibleSidebar] = useState(false);
   const [connect, setConnect] = useState(false);
@@ -71,8 +70,19 @@ const Chat = () => {
   }, [connect]);
 
   // ADD VIDEO
-  const { callUser, answerCall, call, callAccepted } =
-    useContext(SocketContext);
+  const {
+    callUser,
+    answerCall,
+    call,
+    callAccepted,
+    name,
+    myVideo,
+    userVideo,
+    callEnded,
+    stream,
+    askCall,
+    leaveCall,
+  } = useContext(SocketContext);
 
   return (
     <>
@@ -83,7 +93,7 @@ const Chat = () => {
             <Col className="chat-side-menu" xs={2}>
               {chatMenu.map((menu) => {
                 return (
-                  <Link href="/" className={menu.active} key={menu.key}>
+                  <Link to="/" className={menu.active} key={menu.key}>
                     {menu.icon}
                   </Link>
                 );
@@ -351,9 +361,9 @@ const Chat = () => {
           </Row>
         </Container>
       </section>
-      {call.isReceivingCall && !callAccepted && (
-        <Modal centered>
-          <Modal.Header show="true" closeButton>
+      {!callAccepted && (
+        <Modal show={call.isReceivingCall} centered>
+          <Modal.Header closeButton>
             <Modal.Title>Receiving Call</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -369,6 +379,34 @@ const Chat = () => {
               }}
             >
               Aply
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+      {askCall && (
+        <Modal show="true" centered>
+          <Modal.Header>
+            <Modal.Title>videoCall</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {stream && (
+              <>
+                <video playsInline muted ref={myVideo} autoPlay />
+                <p>my Video</p>
+              </>
+            )}
+            {callAccepted && !callEnded && (
+              <video playsInline ref={userVideo} autoPlay />
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                leaveCall(roomId);
+              }}
+            >
+              Close
             </Button>
           </Modal.Footer>
         </Modal>

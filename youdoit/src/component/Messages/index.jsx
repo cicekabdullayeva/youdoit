@@ -6,9 +6,9 @@
 //   InputGroup,
 //   FormControl,
 //   Image,
-// } from "react-bootstrap";
-import TheirMessages from "../../component/TheirMessage/index.jsx";
-import MyMessages from "../../component/MyMessage/index.jsx";
+// // } from "react-bootstrap";
+// import TheirMessages from "../../component/TheirMessage/index.jsx";
+// import MyMessages from "../../component/MyMessage/index.jsx";
 const Messages = ({ data }) => {
   return (
     // {data.map((item)=>{
