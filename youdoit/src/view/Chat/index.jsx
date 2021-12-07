@@ -386,9 +386,10 @@ const Chat = () => {
       {askCall && (
         <Modal show="true" centered>
           <Modal.Header>
-            <Modal.Title>videoCall</Modal.Title>
+            <Modal.Title>VideoCall</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            {!callAccepted ? <h5>Calling...</h5> : null}
             {stream && (
               <>
                 <video playsInline muted ref={myVideo} autoPlay />
