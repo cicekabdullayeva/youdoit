@@ -557,6 +557,7 @@ label {
   border: 1px solid rgba(25, 54, 81, 0.04);
   border-top: none;
   height: 100%;
+  max-width: 440px;
 }
 .chat-message h2 {
   font-weight: 500;
@@ -593,8 +594,8 @@ label {
   margin-bottom: 15px;
   cursor: pointer;
 }
-.message img,
-.message-container img {
+.message > img,
+.message-container .message-header > img {
   height: 53px;
   width: 53px;
   margin-right: 16px;

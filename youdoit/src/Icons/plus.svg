@@ -1,0 +1,19 @@
+<svg
+width="20"
+height="20"
+viewBox="0 0 20 20"
+fill="none"
+xmlns="http://www.w3.org/2000/svg"
+>
+<rect
+    width="20"
+    height="20"
+    rx="4"
+    fill="#2ED06A"
+    fillOpacity="0.6"
+/>
+<path
+    d="M14.6668 10.6663H10.6668V14.6663H9.3335V10.6663H5.3335V9.33301H9.3335V5.33301H10.6668V9.33301H14.6668V10.6663Z"
+    fill="white"
+/>
+</svg>

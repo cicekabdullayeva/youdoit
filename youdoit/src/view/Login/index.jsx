@@ -71,11 +71,11 @@ export default class Login extends React.Component {
       data: data,
     })
       .then((res) => {
-        console.log(res.data);
         // if (res.data.success) {
         window.location.replace("/Chat");
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("id", res.data.id);
+        localStorage.setItem("username", res.data.username);
         // }
       })
       .catch(function (response) {

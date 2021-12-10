@@ -9,27 +9,29 @@ const ContextProvider = ({ children }) => {
   const [stream, setStream] = useState();
   const [name, setName] = useState("");
   const [call, setCall] = useState({});
-  const [me, setMe] = useState('');
   const [askCall, setAskCall] = useState(false)
-
+  const [callerSignal, setCallerSignal] = useState();
+  let myName;
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
-//   let socket;
+// let socket;
 useEffect(() => {
   setTimeout(() => {
-        // console.log('vvf', window.socket)
-        window.socket.on("videoCall",(data)=>{
+        window?.socket?.on("videoCall",(data)=>{
             console.log(data,"Data");
-            setCall({ isReceivingCall: true, name:data.name, signal:data.description,id:data.room_id })
+            setCall({ isReceivingCall: true, name:data.name,id:data.room_id })
             console.log(call,"call");
+            setCallerSignal(data.description);
         });
-        console.log(call.signal,"signal")
-       
-      window.socket.on("joinToVideo",(data)=>{console.log(data,'JOIN')})
-
+        console?.log(call.signal,"signal")
+          myName= localStorage.getItem("username");
+      window?.socket?.on("joinToVideo",(data)=>{         
+        //  peer.signal(data.description);
+})
     }, 2000);
-}, )
+  
+} )
 
   useEffect(() => {
     if(askCall){
@@ -40,8 +42,9 @@ useEffect(() => {
           myVideo.current.srcObject = currentStream;
           // userVideo.current.srcObject=currentStream;
       });
+      
     }
-      console.log(stream);
+      // console.log(stream);
       console.log(userVideo,"userVideo");
       console.log(myVideo,"myVideo")
 
@@ -49,50 +52,101 @@ useEffect(() => {
 
   const answerCall = () => {
     setCallAccepted(true);
-    const peer = new Peer({ initiator: false, trickle: false, stream });
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+      setStream(stream);
+      if (userVideo.current) {
+        userVideo.current.srcObject = stream;
+        console.log("user")
+      }
+      setCallAccepted(true);
+      const peer = new Peer({
+        initiator: false,
+        trickle: false,
+        stream: stream,
+      });
+      peer.on('signal', (data) => {
+        window.socket.emit('answerVideo', { description: data, room_id:call.id });
+        setAskCall(true);
+        console.log("answer");
+      });
 
-    peer.on('signal', (data) => {
-      window.socket.emit('answerVideo', { description: data, room_id:call.id });
-      setAskCall(true);
-      console.log("answer");
-      window.socket.emit("joinToVideo",{room_id:call.id, candidate:data})
-    });
+      peer.on('stream', (currentStream) => {
+        userVideo.current.srcObject = currentStream;
+        console.log(userVideo)
+      });
 
-    peer.on('stream', (currentStream) => {
-      userVideo.current.srcObject = currentStream;
-      console.log(userVideo)
-    });
+      // peer.signal(callerSignal);
 
-    peer.signal(call.signal);
-
-    connectionRef.current = peer;
-    console.log(connectionRef);
-  };
+      connectionRef.current = peer;
+      console.log(connectionRef);
+  })
+  }
 
   const callUser = (id) => {
-    const peer = new Peer({ initiator: true, trickle: false, stream });
+    const peer = new Peer({ initiator: true, trickle: false, config: {
+    
+            iceServers: [
+                {url:'stun:stun01.sipphone.com'},
+                {url:'stun:stun.ekiga.net'},
+                {url:'stun:stun.fwdnet.net'},
+                {url:'stun:stun.ideasip.com'},
+                {url:'stun:stun.iptel.org'},
+                {url:'stun:stun.rixtelecom.se'},
+                {url:'stun:stun.schlund.de'},
+                {url:'stun:stun.l.google.com:19302'},
+                {url:'stun:stun1.l.google.com:19302'},
+                {url:'stun:stun2.l.google.com:19302'},
+                {url:'stun:stun3.l.google.com:19302'},
+                {url:'stun:stun4.l.google.com:19302'},
+                {url:'stun:stunserver.org'},
+                {url:'stun:stun.softjoys.com'},
+                {url:'stun:stun.voiparound.com'},
+                {url:'stun:stun.voipbuster.com'},
+                {url:'stun:stun.voipstunt.com'},
+                {url:'stun:stun.voxgratia.org'},
+                {url:'stun:stun.xten.com'},
+                {
+                url: 'turn:numb.viagenie.ca',
+                credential: 'muazkh',
+                username: 'webrtc@live.com'
+                },
+                {
+                url: 'turn:192.158.29.39:3478?transport=udp',
+                credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+                username: '28224511:1379330808'
+                },
+                {
+                url: 'turn:192.158.29.39:3478?transport=tcp',
+                credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+                username: '28224511:1379330808'
+                }
+            ]
+        }, stream });
     peer.on('signal', (data) => {
-      window.socket.emit('videoCall', { room_id: id, description: data ,name:"cicek" });
+      window.socket.emit('videoCall', { room_id: id, description: data ,name: myName });
       console.log("video")
       setAskCall(true)
     });
 
     peer.on('stream', (currentStream) => {
-      userVideo.current.srcObject = currentStream;
+      if(userVideo.current){
+        userVideo.current.srcObject = currentStream;
+      }
     });
-     window.socket.on('answerVideo', ({description,room_id}) => {
+     window.socket.on('answerVideo', (data) => {
           console.log("accepted");
           setCallAccepted(true);
-          console.log(description,"answer");
-          peer.signal(description);
+          console.log(data.description,"answer");
+          window.socket.emit("joinToVideo",{room_id:call.id, candidate:data})
+
     });
 
     connectionRef.current = peer;
   };
 
-  const leaveCall = (id) => {
+  const leaveCall = () => {
     setCallEnded(true);
-    connectionRef.current.destroy();
+    // connectionRef.current.destroy();
 
     window.socket.emit("declineCall",{room_id:call.id})
     window.location.reload();
@@ -108,7 +162,6 @@ useEffect(() => {
       name,
       setName,
       callEnded,
-      me,
       callUser,
       leaveCall,
       answerCall,
