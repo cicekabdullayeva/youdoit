@@ -11,24 +11,23 @@ const ContextProvider = ({ children }) => {
   const [call, setCall] = useState({});
   const [askCall, setAskCall] = useState(false)
   const [callerSignal, setCallerSignal] = useState();
-  let myName;
-  const myVideo = useRef();
-  const userVideo = useRef();
+  let myName=localStorage.getItem("username");
+  const myVideo = useRef(null);
+  const userVideo = useRef(null);
   const connectionRef = useRef();
+  var candidate = RTCIceCandidate.candidate;
 // let socket;
 useEffect(() => {
   setTimeout(() => {
-        window?.socket?.on("videoCall",(data)=>{
-            console.log(data,"Data");
+        window.socket.on("videoCall",(data)=>{
+            // console.log(data,"Data");
             setCall({ isReceivingCall: true, name:data.name,id:data.room_id })
             console.log(call,"call");
             setCallerSignal(data.description);
         });
-        console?.log(call.signal,"signal")
-          myName= localStorage.getItem("username");
-      window?.socket?.on("joinToVideo",(data)=>{         
-        //  peer.signal(data.description);
-})
+      window.socket.on("joinToVideo",(data)=>{ 
+        console.log("join listen")        
+        })
     }, 2000);
   
 } )
@@ -40,7 +39,9 @@ useEffect(() => {
       setStream(currentStream);
       // console.log("currentStreem");
           myVideo.current.srcObject = currentStream;
-          // userVideo.current.srcObject=currentStream;
+          if(userVideo.current){
+            userVideo.current.srcObject=currentStream;
+          }
       });
       
     }
@@ -48,13 +49,13 @@ useEffect(() => {
       console.log(userVideo,"userVideo");
       console.log(myVideo,"myVideo")
 
-  }, [askCall,call]);
+  }, [askCall]);
 
   const answerCall = () => {
     setCallAccepted(true);
     navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
       setStream(stream);
-      if (userVideo.current) {
+      if (userVideo.current){
         userVideo.current.srcObject = stream;
         console.log("user")
       }
@@ -68,14 +69,17 @@ useEffect(() => {
         window.socket.emit('answerVideo', { description: data, room_id:call.id });
         setAskCall(true);
         console.log("answer");
+      console.log(callerSignal,"callersignal")
+
       });
 
       peer.on('stream', (currentStream) => {
-        userVideo.current.srcObject = currentStream;
-        console.log(userVideo)
+        if(userVideo.current){
+          userVideo.current.srcObject = currentStream;
+        }
       });
 
-      // peer.signal(callerSignal);
+      peer.signal(callerSignal);
 
       connectionRef.current = peer;
       console.log(connectionRef);
@@ -124,20 +128,21 @@ useEffect(() => {
         }, stream });
     peer.on('signal', (data) => {
       window.socket.emit('videoCall', { room_id: id, description: data ,name: myName });
-      console.log("video")
+      console.log("video");
       setAskCall(true)
     });
 
     peer.on('stream', (currentStream) => {
       if(userVideo.current){
+        console.log("uservideo var")
         userVideo.current.srcObject = currentStream;
       }
     });
      window.socket.on('answerVideo', (data) => {
-          console.log("accepted");
           setCallAccepted(true);
           console.log(data.description,"answer");
-          window.socket.emit("joinToVideo",{room_id:call.id, candidate:data})
+          window.socket.emit("joinToVideo",{room_id:call.id, candidate:candidate})
+         peer.signal(data.description);
 
     });
 

@@ -95,7 +95,7 @@ const Chat = () => {
     answerCall,
     call,
     callAccepted,
-    name,
+    // name,
     myVideo,
     userVideo,
     callEnded,
@@ -222,7 +222,7 @@ const Chat = () => {
                         {/* {JSON.stringify(oldMessage)} */}
                         {oldMessage.length > 0
                           ? oldMessage.map((item, index) =>
-                              myId != item.user_id ? (
+                              Number(myId) !== item.user_id ? (
                                 <div className="other-side" key={index}>
                                   <div className="d-flex align-items-end">
                                     <Image
@@ -251,7 +251,7 @@ const Chat = () => {
                           : null}
                         {messages.length > 0
                           ? messages.map((item, index) =>
-                              myId != item.user_id ? (
+                              Number(myId) !== item.user_id ? (
                                 <div className="other-side" key={index}>
                                   <div className="d-flex align-items-end">
                                     <Image
