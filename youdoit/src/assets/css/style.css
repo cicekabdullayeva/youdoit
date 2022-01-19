@@ -799,6 +799,9 @@ label {
 .right-sidebar .d-flex img:not(:nth-child(3n)) {
   margin-right: 10px;
 }
+.rightSidebar-exit {
+  display: none;
+}
 .accordion {
   margin-top: 30px;
 }
@@ -843,6 +846,34 @@ label {
 .modal-dialog {
   max-width: 650px !important;
 }
+/* width */
+::-webkit-scrollbar {
+  width: 0px !important;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(177, 176, 176);
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(177, 176, 176);
+}
+
+@media only screen and (max-width: 1200px) {
+  .right-col {
+    width: 250px;
+    max-width: 250px;
+    padding: 0;
+  }
+  .right-sidebar {
+    width: auto;
+    padding: 30px 15px 30px 15px;
+  }
+}
 @media only screen and (min-width: 992px) {
   .login .right {
     padding: 20px 45px;
@@ -874,13 +905,15 @@ label {
     background-size: 50%;
   }
   .right-col {
-    width: 250px;
-    max-width: 250px;
-    padding: 0;
+    position: absolute;
+    right: 0;
   }
-  .right-sidebar {
-    width: auto;
-    padding: 30px 15px 30px 15px;
+  .rightSidebar-exit {
+    position: absolute;
+    display: block;
+    right: 15px;
+    top: 20px;
+    cursor: pointer;
   }
 }
 

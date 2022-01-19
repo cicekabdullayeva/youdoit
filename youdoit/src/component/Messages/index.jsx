@@ -1,29 +1,28 @@
-// import {
-//   Container,
-//   Row,
-//   Col,
-//   Button,
-//   InputGroup,
-//   FormControl,
-//   Image,
-// // } from "react-bootstrap";
-// import TheirMessages from "../../component/TheirMessage/index.jsx";
-// import MyMessages from "../../component/MyMessage/index.jsx";
-const Messages = ({ data }) => {
+import TheirMessage from "../../component/TheirMessage/index.jsx";
+import MyMessage from "../../component/MyMessage/index.jsx";
+const Messages = ({ oldMessage, messages, myId }) => {
   return (
-    // {data.map((item)=>{
-    //   return (<div className="messages-inside">
-    //   {/* <TheirMessages />
-    //   <MyMessages /> */}
-    //   <div className="user-side">
-    //     <div className="self-message">
-    //       <p>{data.message}</p>
-    //     </div>
-    //     <div className="send-time">Today at 1:32pm</div>
-    //   </div>
-    // </div>)
-    // })}
-    <div></div>
+    <div className="messages-inside">
+      {oldMessage.length > 0
+        ? oldMessage.map((item, index) =>
+            Number(myId) !== item.user_id ? (
+              <TheirMessage key={index} item={item} />
+            ) : (
+              <MyMessage item={item} key={index} />
+            )
+          )
+        : null}
+      {messages.length > 0
+        ? messages.map((item, index) =>
+            Number(myId) !== item.user_id ? (
+              <TheirMessage key={index} item={item} />
+            ) : (
+              <MyMessage item={item} key={index} />
+            )
+          )
+        : null}
+      {/* <div ref={messagesEndRef} /> */}
+    </div>
   );
 };
 export default Messages;

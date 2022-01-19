@@ -20,9 +20,9 @@ import Header from "./header.jsx";
 import { Link } from "react-router-dom";
 import { chatMenu } from "../../menu/chatMenu.js";
 import RightSidebar from "../../component/RightSidebar/index.jsx";
-// import RightMessage from "../../component/RightMessageBlock/index.jsx";
+import LeftMessage from "../../component/RightMessageBlock/index.jsx";
 import io from "socket.io-client";
-// import Messages from "../../component/Messages/index.jsx";
+import Messages from "../../component/Messages/index.jsx";
 import MessageInput from "../../component/MessageInput/index.jsx";
 import SearchSidebar from "../../component/SearchSidebar/index.jsx";
 // Add Video
@@ -36,6 +36,7 @@ const Chat = () => {
   const [connect, setConnect] = useState(false);
   const [searchSidebar, setSearchSidebar] = useState(false);
   const [contacts, setContacts] = useState([]);
+  const [lastMessages, setLastMessages] = useState([]);
   const [room, setRoom] = useState(null);
   const [roomId, setRoomId] = useState("");
   const [messages, setMessages] = useState([]);
@@ -59,6 +60,12 @@ const Chat = () => {
       socket.emit("listContacts");
       socket.on("listContacts", (item) => {
         setContacts(item);
+      });
+      socket.emit("getLastMessages");
+      socket.on("getLastMessages", (item) => {
+        setLastMessages(item);
+        // console.log(item);
+        console.log(lastMessages);
       });
       window.socket = socket;
       setConnect(true);
@@ -128,7 +135,6 @@ const Chat = () => {
                       variant="light"
                       className="ms-auto"
                       onClick={() => {
-                        // setModalVisible(true);
                         setSearchSidebar(true);
                       }}
                     >
@@ -148,36 +154,13 @@ const Chat = () => {
                     {contacts?.length > 0 &&
                       contacts.map((contact, index) => {
                         return (
-                          // <RightMessage
-                          //   name={contact.name}
-                          //   id={contact.id}
-                          //   key={contact.id}
-                          // />
-                          <div
-                            className="message"
-                            key={index}
-                            onClick={() => {
-                              setRoom(contact.name);
-                              setRoomId(contact.id);
-                              setMessages([]);
-                              window.socket.emit("getMessages", {
-                                room_id: contact.id,
-                                page: 1,
-                              });
-                              console.log(contact.id);
-                            }}
-                          >
-                            <Image
-                              src="https://picsum.photos/200/300"
-                              roundedCircle
-                            />
-                            <div className="right-side">
-                              <h3 className="from-who">{contact.name}</h3>
-                              <p className="message-content">
-                                Bu gün işəgələcəksən?
-                              </p>
-                            </div>
-                          </div>
+                          <LeftMessage
+                            contact={contact}
+                            key={contact.id}
+                            setMessages={setMessages}
+                            setRoom={setRoom}
+                            setRoomId={setRoomId}
+                          />
                         );
                       })}
                   </div>
@@ -207,9 +190,7 @@ const Chat = () => {
                       <Button
                         className="btn-light"
                         onClick={() => {
-                          visibleSidebar
-                            ? setVisibleSidebar(false)
-                            : setVisibleSidebar(true);
+                          setVisibleSidebar(!visibleSidebar);
                         }}
                       >
                         <img src={info} alt="" />
@@ -218,68 +199,11 @@ const Chat = () => {
                   </div>
                   {connect ? (
                     <div className="messages-box position-relative">
-                      <div className="messages-inside">
-                        {/* {JSON.stringify(oldMessage)} */}
-                        {oldMessage.length > 0
-                          ? oldMessage.map((item, index) =>
-                              Number(myId) !== item.user_id ? (
-                                <div className="other-side" key={index}>
-                                  <div className="d-flex align-items-end">
-                                    <Image
-                                      src="https://picsum.photos/200/300"
-                                      roundedCircle
-                                    />
-                                    <div className="sender-message">
-                                      <p>{item.message}</p>
-                                    </div>
-                                  </div>
-                                  <div className="send-time">
-                                    Today at 1:32pm
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="user-side" key={index}>
-                                  <div className="self-message">
-                                    <p>{item.message}</p>
-                                  </div>
-                                  <div className="send-time">
-                                    Today at 1:32pm
-                                  </div>
-                                </div>
-                              )
-                            )
-                          : null}
-                        {messages.length > 0
-                          ? messages.map((item, index) =>
-                              Number(myId) !== item.user_id ? (
-                                <div className="other-side" key={index}>
-                                  <div className="d-flex align-items-end">
-                                    <Image
-                                      src="https://picsum.photos/200/300"
-                                      roundedCircle
-                                    />
-                                    <div className="sender-message">
-                                      <p>{item.message}</p>
-                                    </div>
-                                  </div>
-                                  <div className="send-time">
-                                    Today at 1:32pm
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="user-side" key={index}>
-                                  <div className="self-message">
-                                    <p>{item.message}</p>
-                                  </div>
-                                  <div className="send-time">
-                                    Today at 1:32pm
-                                  </div>
-                                </div>
-                              )
-                            )
-                          : null}
-                        <div ref={messagesEndRef} />
-                      </div>
+                      <Messages
+                        oldMessage={oldMessage}
+                        messages={messages}
+                        myId={myId}
+                      />
                       <MessageInput
                         roomId={roomId}
                         setMessages={setMessages}
@@ -287,12 +211,14 @@ const Chat = () => {
                       />
                     </div>
                   ) : (
-                    <h4>Dissconnect</h4>
+                    <h4>Şəbəkə ilə bağlı problem</h4>
                   )}
                 </div>
               ) : null}
             </Col>
-            {visibleSidebar ? <RightSidebar /> : null}
+            {visibleSidebar ? (
+              <RightSidebar name={room} setVisibleSidebar={setVisibleSidebar} />
+            ) : null}
           </Row>
         </Container>
       </section>

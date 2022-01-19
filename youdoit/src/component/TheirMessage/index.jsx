@@ -1,5 +1,5 @@
 import { Image } from "react-bootstrap";
-const TheirMessages = () => {
+const TheirMessages = ({ item, key }) => {
   //   if (true) {
   //     return (
   //       <div className="other-side">
@@ -14,14 +14,11 @@ const TheirMessages = () => {
   //     );
   //   }
   return (
-    <div className="other-side">
+    <div className="other-side" key={key}>
       <div className="d-flex align-items-end">
         <Image src="https://picsum.photos/200/300" roundedCircle />
         <div className="sender-message">
-          <p>
-            Lorem Ipsum passages, and more reces, and more recently with
-            recently with desk Ipsum.
-          </p>
+          <p>{item.message}</p>
         </div>
       </div>
       <div className="send-time">Today at 1:32pm</div>

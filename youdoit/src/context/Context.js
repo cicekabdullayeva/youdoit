@@ -25,9 +25,15 @@ useEffect(() => {
             console.log(call,"call");
             setCallerSignal(data.description);
         });
-      window.socket.on("joinToVideo",(data)=>{ 
-        console.log("join listen")        
-        })
+        window.socket.on("joinToVideo",(data)=>{ 
+          console.log("join listen")        
+        });
+        window.socket.on("declineVideo",(data)=>{ 
+          setCallEnded(true);
+          window.location.reload();       
+        });
+
+
     }, 2000);
   
 } )
@@ -152,8 +158,7 @@ useEffect(() => {
   const leaveCall = () => {
     setCallEnded(true);
     // connectionRef.current.destroy();
-
-    window.socket.emit("declineCall",{room_id:call.id})
+    window.socket.emit("declineVideo",{room_id:call.id})
     window.location.reload();
   };
 

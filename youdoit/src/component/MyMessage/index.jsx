@@ -1,5 +1,5 @@
 // import { Image } from "react-bootstrap";
-const MyMessages = () => {
+const MyMessages = ({ item, key }) => {
   //   if (true) {
   //     return (
   //       <div className="user-side">
@@ -9,12 +9,9 @@ const MyMessages = () => {
   //     );
   //   }
   return (
-    <div className="user-side">
+    <div className="user-side" key={key}>
       <div className="self-message">
-        <p>
-          Lorem Ipsum passages, and more reces, and more recently with desk
-          Ipsum.
-        </p>
+        <p>{item.message}</p>
       </div>
       <div className="send-time">Today at 1:32pm</div>
     </div>

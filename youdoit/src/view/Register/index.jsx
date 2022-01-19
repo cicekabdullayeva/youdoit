@@ -21,6 +21,7 @@ export default class Register extends React.Component {
       password: "",
       passwordShown: false,
       passwordRepeatShown: false,
+      repeatPassword: "",
     };
 
     this.getInputValue = this.getInputValue.bind(this);
@@ -220,6 +221,7 @@ export default class Register extends React.Component {
                           <Form.Label>
                             <Form.Control
                               type="text"
+                              required
                               placeholder="Ad Soyad daxil edin"
                               onChange={(event) =>
                                 this.getInputValue("fullname", event)
@@ -228,11 +230,12 @@ export default class Register extends React.Component {
                           </Form.Label>
                         </Form.Group>
                         <Form.Group controlId="formBasicName">
-                          <span className="input-title">Username</span>
+                          <span className="input-title">Email</span>
                           <Form.Label>
                             <Form.Control
                               type="text"
                               placeholder="Username daxil edin"
+                              required
                               onChange={(event) =>
                                 this.getInputValue("username", event)
                               }
@@ -243,6 +246,7 @@ export default class Register extends React.Component {
                           <span className="input-title">Password</span>
                           <Form.Label>
                             <Form.Control
+                              required
                               type={
                                 this.state.passwordShown ? "text" : "password"
                               }
@@ -296,6 +300,7 @@ export default class Register extends React.Component {
                           <span className="input-title">Password repeat</span>
                           <Form.Label>
                             <Form.Control
+                              required
                               type={
                                 this.state.passwordRepeatShown
                                   ? "text"

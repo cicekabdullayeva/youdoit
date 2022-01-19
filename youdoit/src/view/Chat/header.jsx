@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Row, Col, Badge, Image, Dropdown } from "react-bootstrap";
 import { mainMenu } from "../../menu/mainMenu";
+import subMenuImg from "../../Icons/submenu.svg";
 import { useHistory } from "react-router-dom";
 const Header = () => {
   let history = useHistory();
@@ -13,10 +14,7 @@ const Header = () => {
               <div className="flex-center h-100">
                 <Dropdown className="submenu">
                   <Dropdown.Toggle id="dropdown-basic" className="p-0">
-                    <Image
-                      src={require("../../assets/img/subMenu.svg").default}
-                      className="subMenuImg"
-                    />
+                    <Image src={subMenuImg} className="subMenuImg"></Image>
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="subMenu">
                     {mainMenu.map((menu) => {
@@ -29,6 +27,14 @@ const Header = () => {
                     })}
                   </Dropdown.Menu>
                 </Dropdown>
+                {/* <Dropdown className="submenu">
+                  <Dropdown.Toggle id="dropdown-basic">
+                    <Image src={subMenuImg} className="subMenuImg"></Image>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className="subMenu">
+                    <Dropdown.Item></Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown> */}
                 <div className="logo">
                   <Image src={require("../../assets/img/logo.svg").default} />
                 </div>

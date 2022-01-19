@@ -1,15 +1,22 @@
 import React from "react";
 import { Image, Col, Accordion } from "react-bootstrap";
-// import { Link } from "react-router-dom";
-const RightSidebar = () => {
+import Exit from "../../Icons/exit.svg";
+const RightSidebar = ({ name, setVisibleSidebar }) => {
   return (
-    <Col className="right-col">
+    <Col className="right-col ">
+      <Image
+        src={Exit}
+        className="rightSidebar-exit"
+        onClick={() => {
+          setVisibleSidebar(false);
+        }}
+      ></Image>
       <div className="right-sidebar">
         <Image
           src="https://picsum.photos/200/300"
           className="user-image"
         ></Image>
-        <h2>Nazrin Miriyeva</h2>
+        <h2>{name}</h2>
         <p className="job">UI/UX Designer</p>
         <Accordion>
           <Accordion.Item eventKey="0">
